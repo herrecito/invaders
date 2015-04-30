@@ -13,8 +13,8 @@
 
 #define TITLE "Space Invaders"
 #define MEM_SIZE 0x10000
-#define WIDTH 256
-#define HEIGHT 224
+#define HEIGHT 256
+#define WIDTH 224
 
 // 8080
 mem_t *ram;
@@ -57,15 +57,18 @@ void draw_video_ram(void) {
     uint32_t *pix = surf->pixels;
 
     memset(surf->pixels, 0, WIDTH * HEIGHT * 4);
-    for (int i = 0x2400, j = 0; i < 0x3fff; i++, j += 8) {
-        if (ram->mem[i] & 0b00000001) { pix[j    ] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b00000010) { pix[j + 1] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b00000100) { pix[j + 2] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b00001000) { pix[j + 3] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b00010000) { pix[j + 4] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b00100000) { pix[j + 5] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b01000000) { pix[j + 6] = 0xFFFFFF; }
-        if (ram->mem[i] & 0b10000000) { pix[j + 7] = 0xFFFFFF; }
+
+    int i = 0x2400;
+    for (int col = 0; col < WIDTH; col ++) {
+        for (int row = HEIGHT; row > 0; row -= 8) {
+            for (int j = 0; j < 8; j++) {
+                if (ram->mem[i] & 1 << j) {
+                    pix[(row - j) * WIDTH + col] = 0xFFFFFF;
+                }
+            }
+
+            i++;
+        }
     }
 
     SDL_UnlockSurface(surf);
@@ -86,7 +89,7 @@ void init() {
     if (SDL_Init(SDL_INIT_VIDEO)) { printf("%s\n", SDL_GetError()); exit(1); }
 
     // Create a window
-    win = SDL_CreateWindow(TITLE, 0, 0, WIDTH, WIDTH, 0);
+    win = SDL_CreateWindow(TITLE, 0, 0, WIDTH, HEIGHT, 0);
     if (!win) { puts("Failed to create window"); exit(1); }
 
     // Get surface
