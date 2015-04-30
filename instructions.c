@@ -266,9 +266,6 @@ int DAD_sp(cpu_t *cpu) {
 }
 
 int DAA(cpu_t *cpu) {
-    uint8_t low_nyble = cpu_get_re(cpu, re_a) & 0xF;
-    if (low_nyble > 9 || cpu->flags.ac) {
-    }
     // TODO
 
     return 4;

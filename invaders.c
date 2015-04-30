@@ -101,48 +101,48 @@ void handle_input(void) {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         switch (ev.type) {
-                case SDL_KEYDOWN:
-                    switch (ev.key.keysym.sym) {
-                        case 'c':  // Insert coin
-                            cpu->ports[1] |= 0x1;
-                            break;
-                        case 's':  // P1 Start
-                            cpu->ports[1] |= 0x1 << 2;
-                            break;
-                        case 'w': // P1 Shoot
-                            cpu->ports[1] |= 0x1 << 4;
-                            break;
-                        case 'a': // P1 Move Left
-                            cpu->ports[1] |= 0x1 << 5;
-                            break;
-                        case 'd': // P1 Move Right
-                            cpu->ports[1] |= 0x1 << 6;
-                            break;
-                    }
-                    break;
+            case SDL_KEYDOWN:
+                switch (ev.key.keysym.sym) {
+                    case 'c':  // Insert coin
+                        cpu->ports[1] |= 0x1;
+                        break;
+                    case 's':  // P1 Start
+                        cpu->ports[1] |= 0x1 << 2;
+                        break;
+                    case 'w': // P1 Shoot
+                        cpu->ports[1] |= 0x1 << 4;
+                        break;
+                    case 'a': // P1 Move Left
+                        cpu->ports[1] |= 0x1 << 5;
+                        break;
+                    case 'd': // P1 Move Right
+                        cpu->ports[1] |= 0x1 << 6;
+                        break;
+                }
+                break;
 
-                case SDL_KEYUP:
-                    switch (ev.key.keysym.sym) {
-                        case 'c': // Insert coin
-                            cpu->ports[1] &= ~0x1;
-                            break;
-                        case 's': // P1 Start
-                            cpu->ports[1] &= ~(0x1 << 2);
-                            break;
-                        case 'w': // P1 shoot
-                            cpu->ports[1] &= ~(0x1 << 4);
-                            break;
-                        case 'a': // P1 Move left
-                            cpu->ports[1] &= ~(0x1 << 5);
-                            break;
-                        case 'd': // P1 Move Right
-                            cpu->ports[1] &= ~(0x1 << 6);
-                            break;
-                        case 'q':  // Quit
-                            exit(0);
-                            break;
-                    }
-                    break;
+            case SDL_KEYUP:
+                switch (ev.key.keysym.sym) {
+                    case 'c': // Insert coin
+                        cpu->ports[1] &= ~0x1;
+                        break;
+                    case 's': // P1 Start
+                        cpu->ports[1] &= ~(0x1 << 2);
+                        break;
+                    case 'w': // P1 shoot
+                        cpu->ports[1] &= ~(0x1 << 4);
+                        break;
+                    case 'a': // P1 Move left
+                        cpu->ports[1] &= ~(0x1 << 5);
+                        break;
+                    case 'd': // P1 Move Right
+                        cpu->ports[1] &= ~(0x1 << 6);
+                        break;
+                    case 'q':  // Quit
+                        exit(0);
+                        break;
+                }
+                break;
         }
     }
 }
@@ -166,6 +166,7 @@ int main() {
     int c;
     uint16_t shift_register = 0;
     int shift_amount = 0;
+
     while (1) {
         cpu_fetch(cpu);
 
