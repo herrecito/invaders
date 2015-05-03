@@ -1,4 +1,8 @@
-Implement DAA Y AC Flag
+Emulating the WZ registers is a bit stupid
+
+Finish input
+
+Implement DAA and AC Flag
 
 Slow it down to the right speed
 
