@@ -9,7 +9,6 @@
 #include "mem.h"
 #include "cpu.h"
 #include "disassembler.h"
-#include "instructions.h"
 
 #define TITLE "Space Invaders"
 #define MEM_SIZE 0x10000
@@ -83,8 +82,6 @@ void init() {
     ram = mem_new(MEM_SIZE);
     cpu.mem = ram;
 
-    cpu.sp = 0xf000;  // TODO Why?
-
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO)) { printf("%s\n", SDL_GetError()); exit(1); }
 
@@ -150,7 +147,7 @@ void handle_input(void) {
 void generate_interrupt(uint16_t addr) {
     cpu_push(cpu.pc);
     cpu.pc = addr;
-    cpu.i = 0;
+    cpu.flags.i = 0;
 }
 
 
@@ -173,13 +170,13 @@ int main() {
         // Shift register
         if (cpu.ir == 0xd3) { // OUT
             if (ram->mem[cpu.pc] == 2) { // Set shift amount
-                shift_amount = cpu_get_re(re_a);
+                shift_amount = cpu.a;
             } else if (ram->mem[cpu.pc] == 4) { // Set data in shift register
-                shift_register = (cpu_get_re(re_a) << 8) | (shift_register >> 8);
+                shift_register = (cpu.a << 8) | (shift_register >> 8);
             }
         } else if (cpu.ir == 0xdb) { // IN
             if (ram->mem[cpu.pc] == 3) { // Shift and read data
-                cpu_set_re(re_a, shift_register >> (8 - shift_amount));
+                cpu.a = shift_register >> (8 - shift_amount);
             }
         }
 
@@ -193,7 +190,7 @@ int main() {
             exit(1);
         }
 
-        if (cpu.i) {
+        if (cpu.flags.i) {
             if (cycles > 34132) {  // End of screen
                 draw_video_ram();
                 generate_interrupt(0x10);

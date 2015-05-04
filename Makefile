@@ -6,7 +6,6 @@ bin_folder=bin
 objects=\
 		$(bin_folder)/mem.o\
 		$(bin_folder)/cpu.o\
-		$(bin_folder)/instructions.o\
 		$(bin_folder)/disassembler.o
 
 default: mkdirs invaders
