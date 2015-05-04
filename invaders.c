@@ -18,7 +18,7 @@
 
 // 8080
 mem_t *ram;
-cpu_t *cpu;
+struct cpu cpu;
 
 // SDL
 SDL_Window *win;
@@ -81,9 +81,9 @@ void draw_video_ram(void) {
 void init() {
     // Init 8080
     ram = mem_new(MEM_SIZE);
-    cpu = cpu_new(ram);
+    cpu.mem = ram;
 
-    cpu->sp = 0xf000;  // TODO Why?
+    cpu.sp = 0xf000;  // TODO Why?
 
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO)) { printf("%s\n", SDL_GetError()); exit(1); }
@@ -104,19 +104,19 @@ void handle_input(void) {
             case SDL_KEYDOWN:
                 switch (ev.key.keysym.sym) {
                     case 'c':  // Insert coin
-                        cpu->ports[1] |= 0x1;
+                        cpu.ports[1] |= 0x1;
                         break;
                     case 's':  // P1 Start
-                        cpu->ports[1] |= 0x1 << 2;
+                        cpu.ports[1] |= 0x1 << 2;
                         break;
                     case 'w': // P1 Shoot
-                        cpu->ports[1] |= 0x1 << 4;
+                        cpu.ports[1] |= 0x1 << 4;
                         break;
                     case 'a': // P1 Move Left
-                        cpu->ports[1] |= 0x1 << 5;
+                        cpu.ports[1] |= 0x1 << 5;
                         break;
                     case 'd': // P1 Move Right
-                        cpu->ports[1] |= 0x1 << 6;
+                        cpu.ports[1] |= 0x1 << 6;
                         break;
                 }
                 break;
@@ -124,19 +124,19 @@ void handle_input(void) {
             case SDL_KEYUP:
                 switch (ev.key.keysym.sym) {
                     case 'c': // Insert coin
-                        cpu->ports[1] &= ~0x1;
+                        cpu.ports[1] &= ~0x1;
                         break;
                     case 's': // P1 Start
-                        cpu->ports[1] &= ~(0x1 << 2);
+                        cpu.ports[1] &= ~(0x1 << 2);
                         break;
                     case 'w': // P1 shoot
-                        cpu->ports[1] &= ~(0x1 << 4);
+                        cpu.ports[1] &= ~(0x1 << 4);
                         break;
                     case 'a': // P1 Move left
-                        cpu->ports[1] &= ~(0x1 << 5);
+                        cpu.ports[1] &= ~(0x1 << 5);
                         break;
                     case 'd': // P1 Move Right
-                        cpu->ports[1] &= ~(0x1 << 6);
+                        cpu.ports[1] &= ~(0x1 << 6);
                         break;
                     case 'q':  // Quit
                         exit(0);
@@ -148,9 +148,9 @@ void handle_input(void) {
 }
 
 void generate_interrupt(uint16_t addr) {
-    cpu_push(cpu, cpu->pc);
-    cpu->pc = addr;
-    cpu->i = 0;
+    cpu_push(cpu.pc);
+    cpu.pc = addr;
+    cpu.i = 0;
 }
 
 
@@ -168,32 +168,32 @@ int main() {
     int shift_amount = 0;
 
     while (1) {
-        cpu_fetch(cpu);
+        cpu_fetch();
 
         // Shift register
-        if (cpu->ir == 0xd3) { // OUT
-            if (ram->mem[cpu->pc] == 2) { // Set shift amount
-                shift_amount = cpu_get_re(cpu, re_a);
-            } else if (ram->mem[cpu->pc] == 4) { // Set data in shift register
-                shift_register = (cpu_get_re(cpu, re_a) << 8) | (shift_register >> 8);
+        if (cpu.ir == 0xd3) { // OUT
+            if (ram->mem[cpu.pc] == 2) { // Set shift amount
+                shift_amount = cpu_get_re(re_a);
+            } else if (ram->mem[cpu.pc] == 4) { // Set data in shift register
+                shift_register = (cpu_get_re(re_a) << 8) | (shift_register >> 8);
             }
-        } else if (cpu->ir == 0xdb) { // IN
-            if (ram->mem[cpu->pc] == 3) { // Shift and read data
-                cpu_set_re(cpu, re_a, shift_register >> (8 - shift_amount));
+        } else if (cpu.ir == 0xdb) { // IN
+            if (ram->mem[cpu.pc] == 3) { // Shift and read data
+                cpu_set_re(re_a, shift_register >> (8 - shift_amount));
             }
         }
 
-        if ((c = cpu_run_instruction(cpu))) {
+        if ((c = cpu_run_instruction())) {
             cycles += c;
         } else {
             printf("Error: Unimplemented instruction: ");
-            disassemble(&ram->mem[cpu->pc-1]);
+            disassemble(&ram->mem[cpu.pc-1]);
             puts("");
             cpu_dump(cpu);
             exit(1);
         }
 
-        if (cpu->i) {
+        if (cpu.i) {
             if (cycles > 34132) {  // End of screen
                 draw_video_ram();
                 generate_interrupt(0x10);

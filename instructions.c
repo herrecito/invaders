@@ -9,116 +9,116 @@
  */
 
 // MOV r1, r2 (Move Register)
-int MOV(cpu_t *cpu, re_t to, re_t from) {
-    cpu_set_re(cpu, to, cpu_get_re(cpu, from));
+int MOV(re_t to, re_t from) {
+    cpu_set_re(to, cpu_get_re(from));
 
     return 5;
 }
 
 // MOV r, M (Move from memory)
-int MOV_from_mem(cpu_t *cpu, re_t to) {
-    uint16_t addr = cpu_get_rep(cpu, rep_hl);
-    cpu->registers[to] = mem_read(cpu->mem, addr);
+int MOV_from_mem(re_t to) {
+    uint16_t addr = cpu_get_rep(rep_hl);
+    cpu.registers[to] = mem_read(cpu.mem, addr);
 
     return 7;
 }
 
 // MOV M, r (Move to memory)
-int MOV_to_mem(cpu_t *cpu, re_t from) {
-    uint16_t addr = cpu_get_rep(cpu, rep_hl);
-    mem_write(cpu->mem, addr, cpu_get_re(cpu, from));
+int MOV_to_mem(re_t from) {
+    uint16_t addr = cpu_get_rep(rep_hl);
+    mem_write(cpu.mem, addr, cpu_get_re(from));
 
     return 7;
 }
 
 // MVI r, D8 (Move Immediate)
-int MVI(cpu_t *cpu, re_t to) {
-    cpu_set_re(cpu, to, cpu_get_re(cpu, re_z));
+int MVI(re_t to) {
+    cpu_set_re(to, cpu_get_re(re_z));
 
     return 7;
 }
 
 // MVI M, D8 (Move to memory immediate)
-int MVI_to_mem(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_hl);
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
+int MVI_to_mem() {
+    uint16_t addr = cpu_get_rep(rep_hl);
+    uint8_t byte2 = cpu_get_re(re_z);
 
-    mem_write(cpu->mem, addr, byte2);
+    mem_write(cpu.mem, addr, byte2);
 
     return 10;
 }
 
 // LXI rp, D16 (Load register pair immediate)
-int LXI(cpu_t *cpu, rep_t to) {
-    uint16_t value = cpu_get_rep(cpu, rep_wz);
-    cpu_set_rep(cpu, to, value);
+int LXI(rep_t to) {
+    uint16_t value = cpu_get_rep(rep_wz);
+    cpu_set_rep(to, value);
 
     return 10;
 }
 
-int LXI_SP(cpu_t *cpu) {
-    uint16_t value = cpu_get_rep(cpu, rep_wz);
-    cpu->sp = value;
+int LXI_SP() {
+    uint16_t value = cpu_get_rep(rep_wz);
+    cpu.sp = value;
 
     return 10;
 }
 
 // LDA addr (Load Accumulator direct)
-int LDA(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_wz);
-    uint8_t value = mem_read(cpu->mem, addr);
-    cpu_set_re(cpu, re_a, value);
+int LDA() {
+    uint16_t addr = cpu_get_rep(rep_wz);
+    uint8_t value = mem_read(cpu.mem, addr);
+    cpu_set_re(re_a, value);
 
     return 13;
 }
 
 // STA addr (Store Accumulator direct)
-int STA(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_wz);
-    mem_write(cpu->mem, addr, cpu_get_re(cpu, re_a));
+int STA() {
+    uint16_t addr = cpu_get_rep(rep_wz);
+    mem_write(cpu.mem, addr, cpu_get_re(re_a));
 
     return 13;
 }
 
 // LHLD addr (Load H and L direct)
-int LHLD(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_wz);
+int LHLD() {
+    uint16_t addr = cpu_get_rep(rep_wz);
 
-    cpu_set_re(cpu, re_h, mem_read(cpu->mem, addr+1));
-    cpu_set_re(cpu, re_l, mem_read(cpu->mem, addr));
+    cpu_set_re(re_h, mem_read(cpu.mem, addr+1));
+    cpu_set_re(re_l, mem_read(cpu.mem, addr));
 
     return 16;
 }
 
 // SHLD addr (Store H and L direct)
-int SHLD(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_wz);
+int SHLD() {
+    uint16_t addr = cpu_get_rep(rep_wz);
 
-    mem_write(cpu->mem, addr+1, cpu_get_re(cpu, re_h));
-    mem_write(cpu->mem, addr, cpu_get_re(cpu, re_l));
+    mem_write(cpu.mem, addr+1, cpu_get_re(re_h));
+    mem_write(cpu.mem, addr, cpu_get_re(re_l));
 
     return 16;
 }
 
 // LDAX rp (Load accumulator indirect)
-int LDAX(cpu_t *cpu, rep_t rp) {
-    cpu_set_re(cpu, re_a, mem_read(cpu->mem, cpu_get_rep(cpu, rp)));
+int LDAX(rep_t rp) {
+    cpu_set_re(re_a, mem_read(cpu.mem, cpu_get_rep(rp)));
 
     return 7;
 }
 
 // STAX rp (Store accumulator indirect)
-int STAX(cpu_t *cpu, rep_t rp) {
-    mem_write(cpu->mem, cpu_get_rep(cpu, rp), cpu_get_re(cpu, re_a));
+int STAX(rep_t rp) {
+    mem_write(cpu.mem, cpu_get_rep(rp), cpu_get_re(re_a));
 
     return 7;
 }
 
 // XCHG (Exchange H and L with D and E)
-int XCHG(cpu_t *cpu) {
-    uint16_t temp = cpu_get_rep(cpu, rep_hl);
-    cpu_set_rep(cpu, rep_hl, cpu_get_rep(cpu, rep_de));
-    cpu_set_rep(cpu, rep_de, temp);
+int XCHG() {
+    uint16_t temp = cpu_get_rep(rep_hl);
+    cpu_set_rep(rep_hl, cpu_get_rep(rep_de));
+    cpu_set_rep(rep_de, temp);
 
     return 4;
 }
@@ -130,142 +130,142 @@ int XCHG(cpu_t *cpu) {
  */
 
 // ADD r (Add Register)
-int ADD(cpu_t *cpu, re_t r) {
-    uint16_t result = cpu_get_re(cpu, re_a) + cpu_get_re(cpu, r);
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int ADD(re_t r) {
+    uint16_t result = cpu_get_re(re_a) + cpu_get_re(r);
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 4;
 }
 
 // ADD M (Add memory)
-int ADD_M(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_hl);
-    uint16_t result = cpu_get_re(cpu, re_a) + mem_read(cpu->mem, addr);
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int ADD_M() {
+    uint16_t addr = cpu_get_rep(rep_hl);
+    uint16_t result = cpu_get_re(re_a) + mem_read(cpu.mem, addr);
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 7;
 }
 
 // ADI D8 (Add immediate)
-int ADI(cpu_t *cpu) {
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
-    uint16_t result = cpu_get_re(cpu, re_a) + byte2;
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int ADI() {
+    uint8_t byte2 = cpu_get_re(re_z);
+    uint16_t result = cpu_get_re(re_a) + byte2;
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 7;
 }
 
 // ADC r (Add Register with carry)
-int ADC(cpu_t *cpu, re_t r) {
+int ADC(re_t r) {
     uint16_t result =
-        cpu_get_re(cpu, re_a) + cpu_get_re(cpu, r) + cpu->flags.cy;
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+        cpu_get_re(re_a) + cpu_get_re(r) + cpu.flags.cy;
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 4;
 
 }
 
 // SUB r (Subtract Register)
-int SUB(cpu_t *cpu, re_t r) {
-    uint16_t result = cpu_get_re(cpu, re_a) - cpu_get_re(cpu, r);
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int SUB(re_t r) {
+    uint16_t result = cpu_get_re(re_a) - cpu_get_re(r);
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 4;
 }
 
 // SUI D8 (Add immediate)
-int SUI(cpu_t *cpu) {
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
-    uint16_t result = cpu_get_re(cpu, re_a) - byte2;
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int SUI() {
+    uint8_t byte2 = cpu_get_re(re_z);
+    uint16_t result = cpu_get_re(re_a) - byte2;
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 7;
 }
 
-int SBI(cpu_t *cpu) {
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
-    uint16_t result = cpu_get_re(cpu, re_a) - byte2 - cpu->flags.cy;
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int SBI() {
+    uint8_t byte2 = cpu_get_re(re_z);
+    uint16_t result = cpu_get_re(re_a) - byte2 - cpu.flags.cy;
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 7;
 }
 
 // INR r (Increment Register)
-int INR(cpu_t *cpu, re_t r) {
-    uint16_t result = cpu_get_re(cpu, r) + 1;
-    cpu_set_re(cpu, r, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP | f_ac);
+int INR(re_t r) {
+    uint16_t result = cpu_get_re(r) + 1;
+    cpu_set_re(r, result);
+    cpu_handle_flags(result, 8, F_ZSP | f_ac);
 
     return 5;
 }
 
 // INR M (Increment memory)
-int INR_M(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_hl);
-    uint32_t result = mem_read(cpu->mem, addr) + 1;
-    mem_write(cpu->mem, addr, result);
-    cpu_handle_flags(cpu, result, 16, F_ZSP | f_ac);
+int INR_M() {
+    uint16_t addr = cpu_get_rep(rep_hl);
+    uint32_t result = mem_read(cpu.mem, addr) + 1;
+    mem_write(cpu.mem, addr, result);
+    cpu_handle_flags(result, 16, F_ZSP | f_ac);
 
     return 10;
 }
 
 // DCR r (Decrement Register)
-int DCR(cpu_t *cpu, re_t r) {
-    uint16_t result = cpu_get_re(cpu, r) - 1;
-    cpu_set_re(cpu, r, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP | f_ac);
+int DCR(re_t r) {
+    uint16_t result = cpu_get_re(r) - 1;
+    cpu_set_re(r, result);
+    cpu_handle_flags(result, 8, F_ZSP | f_ac);
     return 5;
 }
 
 // DCR M (Decrement memory)
-int DCR_M(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_hl);
-    uint32_t result = mem_read(cpu->mem, addr) - 1;
-    mem_write(cpu->mem, addr, result);
-    cpu_handle_flags(cpu, result, 16, F_ZSP | f_ac);
+int DCR_M() {
+    uint16_t addr = cpu_get_rep(rep_hl);
+    uint32_t result = mem_read(cpu.mem, addr) - 1;
+    mem_write(cpu.mem, addr, result);
+    cpu_handle_flags(result, 16, F_ZSP | f_ac);
 
     return 10;
 }
 
 // INX rp (Increment register pair)
-int INX(cpu_t *cpu, rep_t rp) {
-    cpu_set_rep(cpu, rp, cpu_get_rep(cpu, rp) + 1);
+int INX(rep_t rp) {
+    cpu_set_rep(rp, cpu_get_rep(rp) + 1);
 
     return 5;
 }
 
 // DCX rp (Decrement register pair)
-int DCX(cpu_t *cpu, rep_t rp) {
-    cpu_set_rep(cpu, rp, cpu_get_rep(cpu, rp) - 1);
+int DCX(rep_t rp) {
+    cpu_set_rep(rp, cpu_get_rep(rp) - 1);
 
     return 5;
 }
 
 // DAD rp (Add register pair to HL)
-int DAD(cpu_t *cpu, rep_t rp) {
-    uint32_t result = cpu_get_rep(cpu, rep_hl) + cpu_get_rep(cpu, rp);
-    cpu_set_rep(cpu, rep_hl, result);
-    cpu_handle_flags(cpu, result, 16, f_cy);
+int DAD(rep_t rp) {
+    uint32_t result = cpu_get_rep(rep_hl) + cpu_get_rep(rp);
+    cpu_set_rep(rep_hl, result);
+    cpu_handle_flags(result, 16, f_cy);
 
     return 10;
 }
 
-int DAD_sp(cpu_t *cpu) {
-    uint32_t result = cpu_get_rep(cpu, rep_hl) + cpu->sp;
-    cpu_set_rep(cpu, rep_hl, result);
-    cpu_handle_flags(cpu, result, 16, f_cy);
+int DAD_sp() {
+    uint32_t result = cpu_get_rep(rep_hl) + cpu.sp;
+    cpu_set_rep(rep_hl, result);
+    cpu_handle_flags(result, 16, f_cy);
 
     return 10;
 }
 
-int DAA(cpu_t *cpu) {
+int DAA() {
     // TODO
 
     return 4;
@@ -278,143 +278,143 @@ int DAA(cpu_t *cpu) {
  */
 
 // ANA r (AND Register)
-int ANA(cpu_t *cpu, re_t r) {
-    uint8_t result = cpu_get_re(cpu, re_a) & cpu_get_re(cpu, r);
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP | f_ac);
-    cpu->flags.cy = 0;
+int ANA(re_t r) {
+    uint8_t result = cpu_get_re(re_a) & cpu_get_re(r);
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP | f_ac);
+    cpu.flags.cy = 0;
 
     return 4;
 }
 
 // ANA M (AND Memory)
-int ANA_M(cpu_t *cpu) {
+int ANA_M() {
     uint8_t result =
-        cpu_get_re(cpu, re_a) & mem_read(cpu->mem, cpu_get_rep(cpu, rep_hl));
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP);
-    cpu->flags.cy = cpu->flags.ac = 0;
+        cpu_get_re(re_a) & mem_read(cpu.mem, cpu_get_rep(rep_hl));
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP);
+    cpu.flags.cy = cpu.flags.ac = 0;
 
     return 7;
 }
 
 
 // ANI D8 (AND immediate)
-int ANI(cpu_t *cpu) {
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
-    uint8_t result = cpu_get_re(cpu, re_a) & byte2;
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP);
-    cpu->flags.cy = cpu->flags.ac = 0;
+int ANI() {
+    uint8_t byte2 = cpu_get_re(re_z);
+    uint8_t result = cpu_get_re(re_a) & byte2;
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP);
+    cpu.flags.cy = cpu.flags.ac = 0;
 
     return 7;
 }
 
 // XRA r (Exclusive OR Register)
-int XRA(cpu_t *cpu, re_t r) {
-    uint8_t result = cpu_get_re(cpu, re_a) ^ cpu_get_re(cpu, r);
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP);
-    cpu->flags.cy = cpu->flags.ac = 0;
+int XRA(re_t r) {
+    uint8_t result = cpu_get_re(re_a) ^ cpu_get_re(r);
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP);
+    cpu.flags.cy = cpu.flags.ac = 0;
 
     return 4;
 }
 
 // ORA r (OR Register)
-int ORA(cpu_t *cpu, re_t r) {
-    uint8_t result = cpu_get_re(cpu, re_a) | cpu_get_re(cpu, r);
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP);
-    cpu->flags.cy = cpu->flags.ac = 0;
+int ORA(re_t r) {
+    uint8_t result = cpu_get_re(re_a) | cpu_get_re(r);
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP);
+    cpu.flags.cy = cpu.flags.ac = 0;
 
     return 4;
 }
 
 // ORA M (OR memory)
-int ORA_M(cpu_t *cpu) {
+int ORA_M() {
     uint8_t result =
-        cpu_get_re(cpu, re_a) | mem_read(cpu->mem, cpu_get_rep(cpu, rep_hl));
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP);
-    cpu->flags.cy = cpu->flags.ac = 0;
+        cpu_get_re(re_a) | mem_read(cpu.mem, cpu_get_rep(rep_hl));
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP);
+    cpu.flags.cy = cpu.flags.ac = 0;
 
     return 7;
 }
 
 // ORI D8 (OR immediate)
-int ORI(cpu_t *cpu) {
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
-    uint8_t result = cpu_get_re(cpu, re_a) | byte2;
-    cpu_set_re(cpu, re_a, result);
-    cpu_handle_flags(cpu, result, 8, F_ZSP);
-    cpu->flags.cy = cpu->flags.ac = 0;
+int ORI() {
+    uint8_t byte2 = cpu_get_re(re_z);
+    uint8_t result = cpu_get_re(re_a) | byte2;
+    cpu_set_re(re_a, result);
+    cpu_handle_flags(result, 8, F_ZSP);
+    cpu.flags.cy = cpu.flags.ac = 0;
 
     return 7;
 }
 
 // CMP r (Compare register)
-int CMP(cpu_t *cpu, re_t r) {
-    uint16_t result = cpu_get_re(cpu, re_a) - cpu_get_re(cpu, r);
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int CMP(re_t r) {
+    uint16_t result = cpu_get_re(re_a) - cpu_get_re(r);
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 4;
 }
 
 // CMP M (Compare memory)
-int CMP_M(cpu_t *cpu) {
+int CMP_M() {
     uint16_t result =
-        cpu_get_re(cpu, re_a) - mem_read(cpu->mem, cpu_get_rep(cpu, rep_hl));
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+        cpu_get_re(re_a) - mem_read(cpu.mem, cpu_get_rep(rep_hl));
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 7;
 }
 
 // CPI D8 (Compare immediate)
-int CPI(cpu_t *cpu) {
-    uint8_t byte2 = cpu_get_re(cpu, re_z);
-    uint16_t result = cpu_get_re(cpu, re_a) - byte2;
-    cpu_handle_flags(cpu, result, 8, F_ALL);
+int CPI() {
+    uint8_t byte2 = cpu_get_re(re_z);
+    uint16_t result = cpu_get_re(re_a) - byte2;
+    cpu_handle_flags(result, 8, F_ALL);
 
     return 7;
 }
 
 // RLC (Rotate left)
-int RLC(cpu_t *cpu) {
-    uint8_t temp = cpu_get_re(cpu, re_a);
-    cpu_set_re(cpu, re_a, (temp << 1) | (temp & 0x80) >> 7);
-    cpu->flags.cy = (temp & 0x80) >> 7;
+int RLC() {
+    uint8_t temp = cpu_get_re(re_a);
+    cpu_set_re(re_a, (temp << 1) | (temp & 0x80) >> 7);
+    cpu.flags.cy = (temp & 0x80) >> 7;
 
     return 4;
 }
 
 // RRC (Rotate Right)
-int RRC(cpu_t *cpu) {
-    uint8_t temp = cpu_get_re(cpu, re_a);
-    cpu_set_re(cpu, re_a, ((temp & 1) << 7) | (temp >> 1));
-    cpu->flags.cy = (temp & 1);
+int RRC() {
+    uint8_t temp = cpu_get_re(re_a);
+    cpu_set_re(re_a, ((temp & 1) << 7) | (temp >> 1));
+    cpu.flags.cy = (temp & 1);
 
     return 4;
 }
 
 // RAR (Rotate right through carry)
-int RAR(cpu_t *cpu) {
-    uint8_t temp = cpu_get_re(cpu, re_a);
-    cpu_set_re(cpu, re_a, (cpu->flags.cy << 7) | (temp >> 1));
-    cpu->flags.cy = (temp & 1);
+int RAR() {
+    uint8_t temp = cpu_get_re(re_a);
+    cpu_set_re(re_a, (cpu.flags.cy << 7) | (temp >> 1));
+    cpu.flags.cy = (temp & 1);
 
     return 4;
 }
 
 // CMA (Complement accumulator)
-int CMA(cpu_t *cpu) {
-    cpu_set_re(cpu, re_a, ~cpu_get_re(cpu, re_a));
+int CMA() {
+    cpu_set_re(re_a, ~cpu_get_re(re_a));
 
     return 4;
 }
 
 // STC (Set carry)
-int STC(cpu_t *cpu) {
-    cpu->flags.cy = 1;
+int STC() {
+    cpu.flags.cy = 1;
 
     return 4;
 }
@@ -425,60 +425,60 @@ int STC(cpu_t *cpu) {
  */
 
 // JMP addr (Jump)
-int JMP(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_wz);
-    cpu->pc = addr;
+int JMP() {
+    uint16_t addr = cpu_get_rep(rep_wz);
+    cpu.pc = addr;
 
     return 10;
 }
 
 // JZ addr (Conditional jump) (Zero)
-int JZ(cpu_t *cpu) {
-    if (cpu->flags.z) { JMP(cpu); }
+int JZ() {
+    if (cpu.flags.z) { JMP(); }
     return 10;
 }
 
 // JNZ addr (Conditional jump) (Not Zero)
-int JNZ(cpu_t *cpu) {
-    if (!cpu->flags.z) { JMP(cpu); }
+int JNZ() {
+    if (!cpu.flags.z) { JMP(); }
 
     return 10;
 }
 
 // JC addr (Conditional jump) (Carry)
-int JC(cpu_t *cpu) {
-    if (cpu->flags.cy) { JMP(cpu); }
+int JC() {
+    if (cpu.flags.cy) { JMP(); }
 
     return 10;
 }
 
 // JNC addr (Conditional jump) (No Carry)
-int JNC(cpu_t *cpu) {
-    if (!cpu->flags.cy) { JMP(cpu); }
+int JNC() {
+    if (!cpu.flags.cy) { JMP(); }
 
     return 10;
 }
 
 // JM addr (Conditional jump) (Minus)
-int JM(cpu_t *cpu) {
-    if (cpu->flags.s) { JMP(cpu); }
+int JM() {
+    if (cpu.flags.s) { JMP(); }
 
     return 10;
 }
 
 // CALL addr (Call)
-int CALL(cpu_t *cpu) {
-    uint16_t addr = cpu_get_rep(cpu, rep_wz);
-    cpu_push(cpu, cpu->pc);
-    cpu->pc = addr;
+int CALL() {
+    uint16_t addr = cpu_get_rep(rep_wz);
+    cpu_push(cpu.pc);
+    cpu.pc = addr;
 
     return 17;
 }
 
 // CZ (Condition call) (Zero)
-int CZ(cpu_t *cpu) {
-    if (cpu->flags.z) {
-        CALL(cpu);
+int CZ() {
+    if (cpu.flags.z) {
+        CALL();
         return 17;
     } else {
         return 11;
@@ -486,9 +486,9 @@ int CZ(cpu_t *cpu) {
 }
 
 // CNZ (Condition call) (Not Zero)
-int CNZ(cpu_t *cpu) {
-    if (!cpu->flags.z) {
-        CALL(cpu);
+int CNZ() {
+    if (!cpu.flags.z) {
+        CALL();
         return 17;
     } else {
         return 11;
@@ -496,9 +496,9 @@ int CNZ(cpu_t *cpu) {
 }
 
 // CNC (Condition call) (Not Carry)
-int CNC(cpu_t *cpu) {
-    if (!cpu->flags.cy) {
-        CALL(cpu);
+int CNC() {
+    if (!cpu.flags.cy) {
+        CALL();
         return 17;
     } else {
         return 11;
@@ -506,17 +506,17 @@ int CNC(cpu_t *cpu) {
 }
 
 // RET (Return)
-int RET(cpu_t *cpu) {
+int RET() {
     uint16_t addr = cpu_pop(cpu);
-    cpu->pc = addr;
+    cpu.pc = addr;
 
     return 10;
 }
 
 // RZ (Conditional Return) (Zero)
-int RZ(cpu_t *cpu) {
-    if (cpu->flags.z) {
-        RET(cpu);
+int RZ() {
+    if (cpu.flags.z) {
+        RET();
         return 11;
     } else {
         return 5;
@@ -524,9 +524,9 @@ int RZ(cpu_t *cpu) {
 }
 
 // RNZ (Conditional Return) (Not Zero)
-int RNZ(cpu_t *cpu) {
-    if (!cpu->flags.z) {
-        RET(cpu);
+int RNZ() {
+    if (!cpu.flags.z) {
+        RET();
         return 11;
     } else {
         return 5;
@@ -534,9 +534,9 @@ int RNZ(cpu_t *cpu) {
 }
 
 // RC (Conditional Return) (Carry)
-int RC(cpu_t *cpu) {
-    if (cpu->flags.cy) {
-        RET(cpu);
+int RC() {
+    if (cpu.flags.cy) {
+        RET();
         return 11;
     } else {
         return 5;
@@ -544,9 +544,9 @@ int RC(cpu_t *cpu) {
 }
 
 // RNC (Conditional Return) (Not Carry)
-int RNC(cpu_t *cpu) {
-    if (!cpu->flags.cy) {
-        RET(cpu);
+int RNC() {
+    if (!cpu.flags.cy) {
+        RET();
         return 11;
     } else {
         return 5;
@@ -554,8 +554,8 @@ int RNC(cpu_t *cpu) {
 }
 
 // PCHL (Jump HL indirect, move HL to PC)
-int PCHL(cpu_t *cpu) {
-    cpu->pc = cpu_get_rep(cpu, rep_hl);
+int PCHL() {
+    cpu.pc = cpu_get_rep(rep_hl);
 
     return 5;
 }
@@ -567,71 +567,71 @@ int PCHL(cpu_t *cpu) {
  */
 
 // PUSH rp (Push)
-int PUSH(cpu_t *cpu, rep_t rp) {
-    cpu_push(cpu, cpu_get_rep(cpu, rp));
+int PUSH(rep_t rp) {
+    cpu_push(cpu_get_rep(rp));
 
     return 11;
 }
 
 // PUSH PSW (Push processor status word) [Note: And accumulator]
-int PUSH_PSW(cpu_t *cpu) {
-    cpu_push(cpu, cpu_status_word(cpu));
+int PUSH_PSW() {
+    cpu_push(cpu_status_word());
 
     return 11;
 }
 
 // POP rp (Pop)
-int POP(cpu_t *cpu, rep_t rp) {
-    cpu_set_rep(cpu, rp, cpu_pop(cpu));
+int POP(rep_t rp) {
+    cpu_set_rep(rp, cpu_pop());
 
     return 10;
 }
 
 // POP PSW (Pop processor status word)
-int POP_PSW(cpu_t *cpu) {
-    uint16_t status_word = cpu_pop(cpu);
+int POP_PSW() {
+    uint16_t status_word = cpu_pop();
 
-    cpu_set_re(cpu, re_a, status_word >> 8);
+    cpu_set_re(re_a, status_word >> 8);
 
-    cpu->flags.cy = status_word;
-    cpu->flags.p = status_word >> 2;
-    cpu->flags.ac = status_word >> 4;
-    cpu->flags.z = status_word >> 6;
-    cpu->flags.s = status_word >> 7;
+    cpu.flags.cy = status_word;
+    cpu.flags.p = status_word >> 2;
+    cpu.flags.ac = status_word >> 4;
+    cpu.flags.z = status_word >> 6;
+    cpu.flags.s = status_word >> 7;
 
     return 10;
 }
 
 // XTHL (Exchange stack top with H and L)
-int XTHL(cpu_t *cpu) {
-    uint16_t temp = cpu_pop(cpu);
-    cpu_push(cpu, cpu_get_rep(cpu, rep_hl));
-    cpu_set_rep(cpu, rep_hl, temp);
+int XTHL() {
+    uint16_t temp = cpu_pop();
+    cpu_push(cpu_get_rep(rep_hl));
+    cpu_set_rep(rep_hl, temp);
 
     return 18;
 }
 
 // IN port (Input)
-int IN(cpu_t *cpu) {
-    uint8_t port = cpu_get_re(cpu, re_z);
+int IN() {
+    uint8_t port = cpu_get_re(re_z);
     if (port == 3) { return 10; }
-    cpu_set_re(cpu, re_a, cpu->ports[port]);
+    cpu_set_re(re_a, cpu.ports[port]);
 
     return 10;
 }
 
 // OUT port (Output)
-int OUT(cpu_t *cpu) {
-    uint8_t port = cpu_get_re(cpu, re_z);
+int OUT() {
+    uint8_t port = cpu_get_re(re_z);
     if (port == 2 || port == 4) { return 10; }
-    cpu->ports[port] = cpu_get_re(cpu, re_a);
+    cpu.ports[port] = cpu_get_re(re_a);
 
     return 10;
 }
 
 // EI (Enable interrupts)
-int EI(cpu_t *cpu) {
-    cpu->i = 1;
+int EI() {
+    cpu.i = 1;
 
     return 4;
 }

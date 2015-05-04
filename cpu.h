@@ -33,7 +33,7 @@ struct ConditionFlags {
     uint8_t ac:1;  // Auxiliary Carry
 };
 
-typedef struct CPU {
+struct cpu {
     uint8_t ir;             // Instruction register
     uint16_t pc;            // Program counter
     uint16_t sp;            // Stack pointer
@@ -42,20 +42,21 @@ typedef struct CPU {
     uint8_t ports[9];       // Ports
     uint8_t i:1;            // Interrupt flag
     struct ConditionFlags flags;
-} cpu_t;
+};
 
-cpu_t *cpu_new(mem_t *mem);
-void cpu_dump(cpu_t *cpu);
-uint8_t cpu_get_re(cpu_t *cpu, re_t r);
-uint16_t cpu_get_rep(cpu_t *cpu, rep_t rp);
-void cpu_set_re(cpu_t *cpu, re_t r, uint8_t value);
-void cpu_set_rep(cpu_t *cpu, rep_t rp, uint16_t value);
-void cpu_fetch(cpu_t *cpu);
-int cpu_run_instruction(cpu_t *cpu);
-void cpu_push(cpu_t *cpu, uint16_t value);
-uint16_t cpu_pop(cpu_t *cpu);
-void cpu_handle_flags(cpu_t *cpu, uint32_t result, size_t size, int flags);
-uint16_t cpu_status_word(cpu_t *cpu);
+extern struct cpu cpu;
+
+void cpu_dump();
+uint8_t cpu_get_re(re_t r);
+uint16_t cpu_get_rep(rep_t rp);
+void cpu_set_re(re_t r, uint8_t value);
+void cpu_set_rep(rep_t rp, uint16_t value);
+void cpu_fetch();
+int cpu_run_instruction();
+void cpu_push(uint16_t value);
+uint16_t cpu_pop();
+void cpu_handle_flags(uint32_t result, size_t size, int flags);
+uint16_t cpu_status_word();
 
 
 #endif
