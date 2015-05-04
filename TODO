@@ -1,10 +1,8 @@
-Emulating the WZ registers is a bit stupid
+Get source and destination from opcodes
 
 Finish input
 
 Implement DAA and AC Flag
-
-Slow it down to the right speed
 
 Finish all instructions
 
