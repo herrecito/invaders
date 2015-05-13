@@ -14,6 +14,9 @@
 #define MEM_SIZE 0x10000
 #define HEIGHT 256
 #define WIDTH 224
+#define TIC (1000.0 / 60.0)  // Milliseconds per tic
+#define CYCLES_PER_MS (2000)  // 8080 runs at 2 Mhz
+#define CYCLES_PER_TIC (CYCLES_PER_MS * TIC)
 
 // 8080
 mem_t *ram;
@@ -22,6 +25,14 @@ struct cpu cpu;
 // SDL
 SDL_Window *win;
 SDL_Surface *surf;
+
+void die() {
+    printf("Error: Unimplemented instruction: ");
+    disassemble(&ram->mem[cpu.pc-1]);
+    puts("");
+    cpu_dump(cpu);
+    exit(1);
+}
 
 
 void load_rom(mem_t *mem, const char *file_name) {
@@ -144,6 +155,7 @@ void handle_input(void) {
     }
 }
 
+
 void generate_interrupt(uint16_t addr) {
     cpu_push(cpu.pc);
     cpu.pc = addr;
@@ -151,65 +163,64 @@ void generate_interrupt(uint16_t addr) {
 }
 
 
-int main() {
-    // Init 8080 and SDL
-    init();
 
-    // Load ROM
+void emulate_shift_register() {
+    static uint16_t shift_register;
+    static int shift_amount;
+
+    if (cpu.ir == 0xd3) { // OUT
+        if (ram->mem[cpu.pc] == 2) { // Set shift amount
+            shift_amount = cpu.a;
+        } else if (ram->mem[cpu.pc] == 4) { // Set data in shift register
+            shift_register = (cpu.a << 8) | (shift_register >> 8);
+        }
+    } else if (cpu.ir == 0xdb) { // IN
+        if (ram->mem[cpu.pc] == 3) { // Shift and read data
+            cpu.a = shift_register >> (8 - shift_amount);
+        }
+    }
+}
+
+
+void cpu_run(long cycles) {
+    long i = 0;
+    while (i < cycles) {
+        cpu_fetch();
+
+        emulate_shift_register();
+
+        int c;
+        if ((c = cpu_run_instruction())) {
+            i += c;
+        } else {
+            die();
+        }
+    }
+}
+
+
+int main() {
+    init();  // Init 8080 and SDL
     load_rom(ram, "invaders.rom");
 
     // Run emulation
-    long long int cycles = 0;
-    uint32_t last_time = 0;
-    uint16_t shift_register;
-    int shift_amount;
-    int c;
+    uint32_t last_tic = SDL_GetTicks();  // Milliseconds
+
     while (1) {
-        uint32_t time = SDL_GetTicks();
-        if (time > last_time + (1000.0 / 60)) {
-            int ci = 0;
-            while (ci < 55555) {
-                cpu_fetch();
+        if ((SDL_GetTicks() - last_tic) >= TIC) {
+            last_tic = SDL_GetTicks();
 
-                // Shift register
-                if (cpu.ir == 0xd3) { // OUT
-                    if (ram->mem[cpu.pc] == 2) { // Set shift amount
-                        shift_amount = cpu.a;
-                    } else if (ram->mem[cpu.pc] == 4) { // Set data in shift register
-                        shift_register = (cpu.a << 8) | (shift_register >> 8);
-                    }
-                } else if (cpu.ir == 0xdb) { // IN
-                    if (ram->mem[cpu.pc] == 3) { // Shift and read data
-                        cpu.a = shift_register >> (8 - shift_amount);
-                    }
-                }
+            cpu_run(CYCLES_PER_TIC / 2);
 
-                if ((c = cpu_run_instruction())) {
-                    cycles += c;
-                    ci += c;
-                } else {
-                    printf("Error: Unimplemented instruction: ");
-                    disassemble(&ram->mem[cpu.pc-1]);
-                    puts("");
-                    cpu_dump(cpu);
-                    exit(1);
-                }
+            if (cpu.flags.i) { generate_interrupt(0x08); }
 
-                if (cpu.flags.i) {
-                    if (cycles > 34132) {  // End of screen
-                        draw_video_ram();
-                        generate_interrupt(0x10);
-                        cycles -= 34132;
-                    } else if (cycles > 17066) {  // Mid of screen
-                        generate_interrupt(0x08);
-                    }
-                }
+            cpu_run(CYCLES_PER_TIC / 2);
 
-                // Input
-                handle_input();
+            handle_input();
+            draw_video_ram();
+            if (cpu.flags.i) { generate_interrupt(0x10); }
 
-            }
-            last_time = time;
+            if (SDL_GetTicks() - last_tic > TIC) { puts("Too slow!"); }
         }
     }
 
