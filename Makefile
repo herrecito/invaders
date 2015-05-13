@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-g -Wall -std=c99
+CFLAGS=-g -O3 -Wall -std=c99
 
 bin_folder=bin
 
@@ -21,6 +21,9 @@ mkdirs:
 
 clean:
 	rm -rf $(bin_folder)
-	rm -f invaders
+	rm -f invaders tags
 
-.PHONY: clean mkdirs
+tags:
+	ctags *.c *.h
+
+.PHONY: clean mkdirs tags
