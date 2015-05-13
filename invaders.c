@@ -15,14 +15,12 @@
 #define HEIGHT 256
 #define WIDTH 224
 #define TIC (1000.0 / 60.0)  // Milliseconds per tic
-#define CYCLES_PER_MS (2000)  // 8080 runs at 2 Mhz
+#define CYCLES_PER_MS 2000  // 8080 runs at 2 Mhz
 #define CYCLES_PER_TIC (CYCLES_PER_MS * TIC)
 
-// 8080
+// Globals
 mem_t *ram;
 struct cpu cpu;
-
-// SDL
 SDL_Window *win;
 SDL_Surface *surf;
 
@@ -120,9 +118,11 @@ void handle_input(void) {
                     case 'w': // P1 Shoot
                         cpu.ports[1] |= 0x1 << 4;
                         break;
+                    case SDLK_LEFT:
                     case 'a': // P1 Move Left
                         cpu.ports[1] |= 0x1 << 5;
                         break;
+                    case SDLK_RIGHT:
                     case 'd': // P1 Move Right
                         cpu.ports[1] |= 0x1 << 6;
                         break;
@@ -140,9 +140,11 @@ void handle_input(void) {
                     case 'w': // P1 shoot
                         cpu.ports[1] &= ~(0x1 << 4);
                         break;
+                    case SDLK_LEFT:
                     case 'a': // P1 Move left
                         cpu.ports[1] &= ~(0x1 << 5);
                         break;
+                    case SDLK_RIGHT:
                     case 'd': // P1 Move Right
                         cpu.ports[1] &= ~(0x1 << 6);
                         break;

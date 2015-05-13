@@ -41,7 +41,7 @@ void cpu_read_byte_to_z() {
 
 void cpu_handle_flags(uint32_t result, size_t size, int flags) {
     if (flags & f_z) {
-        // TODO May be wrong
+        // TODO Will be wrong if result has overflowed
         cpu.flags.z = (result == 0);
     }
 

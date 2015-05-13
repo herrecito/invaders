@@ -51,8 +51,8 @@ struct cpu {
             uint16_t af;
         };
     };
-    mem_t *mem;             // RAM
-    uint8_t ports[9];       // Ports
+    mem_t *mem;        // RAM
+    uint8_t ports[9];  // Ports
 };
 
 extern struct cpu cpu;
