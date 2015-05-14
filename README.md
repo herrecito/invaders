@@ -2,6 +2,8 @@
 
 A Space Invaders / Intel 8080 emulator in C, using SDL.
 
+![invaders](http://i.imgur.com/q4Y5Vae.gif)
+
 The code should be really easy to understand to anyone wanting to learn how to
 create its own emulator.
 
