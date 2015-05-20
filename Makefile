@@ -1,5 +1,5 @@
-CC=clang
-CFLAGS=-g -O3 -Wall -std=c99
+CC=gcc
+CFLAGS=-std=c99 -g -Og -Wall -fdiagnostics-color
 
 bin_folder=bin
 
@@ -11,7 +11,7 @@ objects=\
 default: mkdirs invaders
 
 $(bin_folder)/%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 invaders: $(objects) invaders.c
 	$(CC) $(CFLAGS) $(shell sdl2-config --cflags) $(shell sdl2-config --libs) -o $@ $^
