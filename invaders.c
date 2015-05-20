@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_error.h>
-#include <SDL2/SDL_pixels.h>
-#include <SDL2/SDL_render.h>
+#include <SDL.h>
+#include <SDL_error.h>
+#include <SDL_pixels.h>
+#include <SDL_render.h>
 
 #include "mem.h"
 #include "cpu.h"
