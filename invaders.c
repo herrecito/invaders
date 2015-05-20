@@ -103,7 +103,7 @@ void init() {
     if (!surf) { puts("Failed to get surface"); exit(1); }
 }
 
-void handle_input(void) {
+void handle_input() {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         switch (ev.type) {
@@ -165,7 +165,6 @@ void generate_interrupt(uint16_t addr) {
 }
 
 
-
 void emulate_shift_register() {
     static uint16_t shift_register;
     static int shift_amount;
@@ -205,9 +204,7 @@ int main() {
     init();  // Init 8080 and SDL
     load_rom(ram, "invaders.rom");
 
-    // Run emulation
-    uint32_t last_tic = SDL_GetTicks();  // Milliseconds
-
+    uint32_t last_tic = SDL_GetTicks();  // milliseconds
     while (1) {
         if ((SDL_GetTicks() - last_tic) >= TIC) {
             last_tic = SDL_GetTicks();
