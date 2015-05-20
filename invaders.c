@@ -59,19 +59,19 @@ void load_rom(mem_t *mem, const char *file_name) {
 }
 
 
-void draw_video_ram(void) {
+void draw_video_ram() {
     // Lock surface to make the pixels pointer valid
     if (SDL_LockSurface(surf)) { puts(SDL_GetError()); exit(1); }
     uint32_t *pix = surf->pixels;
 
-    memset(surf->pixels, 0, WIDTH * HEIGHT * 4);
-
-    int i = 0x2400;
+    int i = 0x2400;  // Start of Video RAM
     for (int col = 0; col < WIDTH; col ++) {
         for (int row = HEIGHT; row > 0; row -= 8) {
             for (int j = 0; j < 8; j++) {
                 if (ram->mem[i] & 1 << j) {
                     pix[(row - j) * WIDTH + col] = 0xFFFFFF;
+                } else {
+                    pix[(row - j) * WIDTH + col] = 0x000000;
                 }
             }
 
