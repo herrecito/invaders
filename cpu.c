@@ -267,7 +267,20 @@ static int DAD(uint16_t *rp) {
 
 // Decimal adjust accumulator
 static int DAA() {
-    // TODO
+    uint8_t low_nibble = cpu.a & 0x0F;
+    uint8_t high_nibble = (cpu.a & 0xF0) >> 4;
+
+    if (low_nibble > 9 || cpu.flags.ac) {
+        low_nibble += 6;
+        cpu.flags.ac = 1;
+    }
+
+    if (high_nibble > 9 || cpu.flags.cy) {
+        high_nibble += 6;
+        cpu.flags.cy = 1;
+    }
+
+    cpu.a = high_nibble << 4 | low_nibble;
 
     return 4;
 }
@@ -703,6 +716,10 @@ void cpu_handle_flags(uint32_t result, size_t size, int flags) {
 
     if (flags & f_s) {
         cpu.flags.s = (result & (1 << (size-1))) >> (size-1) == 1;
+    }
+
+    if (flags & f_ac) {
+        cpu.flags.ac = 0;
     }
 
     if (flags & f_cy) {
