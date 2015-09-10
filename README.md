@@ -4,7 +4,7 @@ A Space Invaders / Intel 8080 emulator in C, using SDL.
 
 ![invaders](http://i.imgur.com/q4Y5Vae.gif)
 
-The code should be really easy to understand to anyone wanting to learn how to
+The code should be really easy to understand for anyone wanting to learn how to
 create its own emulator.
 
 To run it:
@@ -36,7 +36,7 @@ display the credits so the game its fully playable.
 ## Useful links
 
 * [Emulator 101](http://emulator101.com/)
-* [Computer Archeology](http://www.computerarcheology.com/wiki/wiki/Arcade/SpaceInvaders)
+* [Computer Archeology](http://computerarcheology.com/Arcade/SpaceInvaders)
 * [JavaScript 8080 Emulator](http://bluishcoder.co.nz/js8080/)
 * [SIEMU](http://www.darkpact.com/proj/siemu/)
 * [Wikipedia - Intel 8080](http://en.wikipedia.org/wiki/Intel_8080)
