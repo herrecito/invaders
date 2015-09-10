@@ -117,7 +117,7 @@ void init() {
     win = SDL_CreateWindow(
             TITLE,
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            3*WIDTH, 3*HEIGHT,
+            2*WIDTH, 2*HEIGHT,
             SDL_WINDOW_RESIZABLE
             );
     if (!win) {
