@@ -160,6 +160,10 @@ void handle_input() {
                         break;
                 }
                 break;
+
+            case SDL_QUIT:
+                exit(0);
+                break;
         }
     }
 }
