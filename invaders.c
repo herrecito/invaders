@@ -2,9 +2,6 @@
 #include <stdlib.h>
 
 #include <SDL.h>
-#include <SDL_error.h>
-#include <SDL_pixels.h>
-#include <SDL_render.h>
 
 #include "mem.h"
 #include "cpu.h"
@@ -20,7 +17,6 @@
 
 // Globals
 mem_t *ram;
-struct cpu cpu;
 SDL_Window *win;
 SDL_Surface *surf;
 
@@ -82,7 +78,9 @@ void draw_video_ram() {
     SDL_UnlockSurface(surf);
 
     // Update window
-    if (SDL_UpdateWindowSurface(win)) { puts(SDL_GetError()); }
+    if (SDL_UpdateWindowSurface(win)) {
+        puts(SDL_GetError());
+    }
 }
 
 
@@ -92,15 +90,24 @@ void init() {
     cpu.mem = ram;
 
     // Init SDL
-    if (SDL_Init(SDL_INIT_VIDEO)) { printf("%s\n", SDL_GetError()); exit(1); }
+    if (SDL_Init(SDL_INIT_VIDEO)) {
+        printf("%s\n", SDL_GetError());
+        exit(1);
+    }
 
     // Create a window
     win = SDL_CreateWindow(TITLE, 0, 0, WIDTH, HEIGHT, 0);
-    if (!win) { puts("Failed to create window"); exit(1); }
+    if (!win) {
+        puts("Failed to create window");
+        exit(1);
+    }
 
     // Get surface
     surf = SDL_GetWindowSurface(win);
-    if (!surf) { puts("Failed to get surface"); exit(1); }
+    if (!surf) {
+        puts("Failed to get surface");
+        exit(1);
+    }
 }
 
 void handle_input() {
@@ -184,7 +191,7 @@ void emulate_shift_register() {
 
 
 void cpu_run(long cycles) {
-    long i = 0;
+    int i = 0;
     while (i < cycles) {
         cpu_fetch();
 
@@ -211,15 +218,22 @@ int main() {
 
             cpu_run(CYCLES_PER_TIC / 2);
 
-            if (cpu.flags.i) { generate_interrupt(0x08); }
+            if (cpu.flags.i) {
+                generate_interrupt(0x08);
+            }
 
             cpu_run(CYCLES_PER_TIC / 2);
 
             handle_input();
             draw_video_ram();
-            if (cpu.flags.i) { generate_interrupt(0x10); }
 
-            if (SDL_GetTicks() - last_tic > TIC) { puts("Too slow!"); }
+            if (cpu.flags.i) {
+                generate_interrupt(0x10);
+            }
+
+            if (SDL_GetTicks() - last_tic > TIC) {
+                puts("Too slow!");
+            }
         }
     }
 

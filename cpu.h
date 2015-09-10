@@ -1,6 +1,8 @@
 #ifndef _H_CPU_
 #define _H_CPU_
 
+#include <stdint.h>
+
 #include "mem.h"
 
 typedef enum CF {
