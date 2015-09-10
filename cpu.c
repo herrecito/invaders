@@ -795,6 +795,10 @@ int cpu_run_instruction() {
             return MOV_to_mem(&cpu.b);
         case 0x71:  // MOV M, C
             return MOV_to_mem(&cpu.c);
+        case 0x72:  // MOV M, D
+            return MOV_to_mem(&cpu.d);
+        case 0x73:  // MOV M, E
+            return MOV_to_mem(&cpu.e);
         case 0x77:  // MOV M, A
             return MOV_to_mem(&cpu.a);
 
@@ -888,6 +892,8 @@ int cpu_run_instruction() {
             return DCR(&cpu.c);
         case 0x15: // DCR D
             return DCR(&cpu.d);
+        case 0x25: // DCR H
+            return DCR(&cpu.h);
         case 0x3d: // DCR A
             return DCR(&cpu.a);
 
@@ -933,6 +939,8 @@ int cpu_run_instruction() {
 
         case 0xa0: // ANA B
             return ANA(&cpu.b);
+        case 0xa1: // ANA C
+            return ANA(&cpu.c);
         case 0xa7: // ANA A
             return ANA(&cpu.a);
 

@@ -146,21 +146,31 @@ void handle_input() {
             case SDL_KEYDOWN:
                 switch (ev.key.keysym.sym) {
                     case 'c':  // Insert coin
-                        cpu.ports[1] |= 0x1;
+                        cpu.ports[1] |= 1;
                         break;
                     case 's':  // P1 Start
-                        cpu.ports[1] |= 0x1 << 2;
+                        cpu.ports[1] |= 1 << 2;
                         break;
                     case 'w': // P1 Shoot
-                        cpu.ports[1] |= 0x1 << 4;
+                        cpu.ports[1] |= 1 << 4;
                         break;
-                    case SDLK_LEFT:
                     case 'a': // P1 Move Left
-                        cpu.ports[1] |= 0x1 << 5;
+                        cpu.ports[1] |= 1 << 5;
                         break;
-                    case SDLK_RIGHT:
                     case 'd': // P1 Move Right
-                        cpu.ports[1] |= 0x1 << 6;
+                        cpu.ports[1] |= 1 << 6;
+                        break;
+                    case SDLK_LEFT: // P2 Move Left
+                        cpu.ports[2] |= 1 << 5;
+                        break;
+                    case SDLK_RIGHT: // P2 Move Right
+                        cpu.ports[2] |= 1 << 6;
+                        break;
+                    case SDLK_RETURN: // P2 Start
+                        cpu.ports[1] |= 1 << 1;
+                        break;
+                    case SDLK_UP: // P2 Shoot
+                        cpu.ports[2] |= 1 << 4;
                         break;
                 }
                 break;
@@ -168,22 +178,33 @@ void handle_input() {
             case SDL_KEYUP:
                 switch (ev.key.keysym.sym) {
                     case 'c': // Insert coin
-                        cpu.ports[1] &= ~0x1;
+                        cpu.ports[1] &= ~1;
                         break;
                     case 's': // P1 Start
-                        cpu.ports[1] &= ~(0x1 << 2);
+                        cpu.ports[1] &= ~(1 << 2);
                         break;
                     case 'w': // P1 shoot
-                        cpu.ports[1] &= ~(0x1 << 4);
+                        cpu.ports[1] &= ~(1 << 4);
                         break;
-                    case SDLK_LEFT:
                     case 'a': // P1 Move left
-                        cpu.ports[1] &= ~(0x1 << 5);
+                        cpu.ports[1] &= ~(1 << 5);
                         break;
-                    case SDLK_RIGHT:
                     case 'd': // P1 Move Right
-                        cpu.ports[1] &= ~(0x1 << 6);
+                        cpu.ports[1] &= ~(1 << 6);
                         break;
+                    case SDLK_LEFT: // P2 Move Left
+                        cpu.ports[2] &= ~(1 << 5);
+                        break;
+                    case SDLK_RIGHT: // P2 Move Right
+                        cpu.ports[2] &= ~(1 << 6);
+                        break;
+                    case SDLK_RETURN: // P2 Start
+                        cpu.ports[1] &= ~(1 << 1);
+                        break;
+                    case SDLK_UP: // P2 Shoot
+                        cpu.ports[2] &= ~(1 << 4);
+                        break;
+
                     case 'q':  // Quit
                         exit(0);
                         break;
