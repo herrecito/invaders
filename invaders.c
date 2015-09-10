@@ -17,8 +17,11 @@
 
 // Globals
 mem_t *ram;
-SDL_Window *win;
+
 SDL_Surface *surf;
+int resizef;
+SDL_Window *win;
+SDL_Surface *winsurf;
 
 void die() {
     printf("Error: Unimplemented instruction: ");
@@ -56,18 +59,18 @@ void load_rom(mem_t *mem, const char *file_name) {
 
 
 void draw_video_ram() {
-    // Lock surface to make the pixels pointer valid
-    if (SDL_LockSurface(surf)) { puts(SDL_GetError()); exit(1); }
     uint32_t *pix = surf->pixels;
 
     int i = 0x2400;  // Start of Video RAM
     for (int col = 0; col < WIDTH; col ++) {
         for (int row = HEIGHT; row > 0; row -= 8) {
             for (int j = 0; j < 8; j++) {
+                int idx = (row - j) * WIDTH + col;
+
                 if (ram->mem[i] & 1 << j) {
-                    pix[(row - j) * WIDTH + col] = 0xFFFFFF;
+                    pix[idx] = 0xFFFFFF;
                 } else {
-                    pix[(row - j) * WIDTH + col] = 0x000000;
+                    pix[idx] = 0x000000;
                 }
             }
 
@@ -75,13 +78,28 @@ void draw_video_ram() {
         }
     }
 
-    SDL_UnlockSurface(surf);
+    if (resizef) {
+        winsurf = SDL_GetWindowSurface(win);
+    }
+
+    SDL_BlitScaled(surf, NULL, winsurf, NULL);
 
     // Update window
     if (SDL_UpdateWindowSurface(win)) {
         puts(SDL_GetError());
     }
 }
+
+int HandleResize(void *userdata, SDL_Event *ev) {
+    if (ev->type == SDL_WINDOWEVENT) {
+        if (ev->window.event == SDL_WINDOWEVENT_RESIZED) {
+            resizef = 1;
+        }
+    }
+
+    return 0;  // Ignored
+}
+
 
 
 void init() {
@@ -96,18 +114,29 @@ void init() {
     }
 
     // Create a window
-    win = SDL_CreateWindow(TITLE, 0, 0, WIDTH, HEIGHT, 0);
+    win = SDL_CreateWindow(
+            TITLE,
+            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+            3*WIDTH, 3*HEIGHT,
+            SDL_WINDOW_RESIZABLE
+            );
     if (!win) {
         puts("Failed to create window");
         exit(1);
     }
 
     // Get surface
-    surf = SDL_GetWindowSurface(win);
-    if (!surf) {
+    winsurf = SDL_GetWindowSurface(win);
+    if (!winsurf) {
         puts("Failed to get surface");
         exit(1);
     }
+
+    // Handle resize events
+    SDL_AddEventWatch(HandleResize, NULL);
+
+    // Create backbuffer surface
+    surf = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);
 }
 
 void handle_input() {
