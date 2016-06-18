@@ -108,7 +108,7 @@ void init() {
     cpu.mem = ram;
 
     // Init SDL
-    if (SDL_Init(SDL_INIT_VIDEO)) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         printf("%s\n", SDL_GetError());
         exit(1);
     }
@@ -261,8 +261,46 @@ void cpu_run(long cycles) {
 }
 
 
+void audio_cb(void *userdata, uint8_t *stream, int len) {
+    SDL_AudioSpec wav_spec;
+    uint32_t wav_length;
+    uint8_t *wav_buffer;
+
+    if (SDL_LoadWAV("explosion.wav", &wav_spec, &wav_buffer, &wav_length) == NULL) {
+        printf("Could not open explosion.wav: %s\n", SDL_GetError());
+    }
+
+    SDL_memset(stream, 0, len);
+    SDL_MixAudioFormat(stream, wav_buffer, AUDIO_F32, len, SDL_MIX_MAXVOLUME);
+
+    SDL_FreeWAV(wav_buffer);
+}
+
+
+void init_audio() {
+    SDL_AudioSpec want, have;
+    SDL_zero(want);
+    want.freq = 48000;
+    want.format = AUDIO_F32;
+    want.channels = 2;
+    want.samples = 4096;
+    want.callback = audio_cb;
+
+    SDL_AudioDeviceID dev = SDL_OpenAudioDevice(NULL, 0, &want, &have,
+            SDL_AUDIO_ALLOW_ANY_CHANGE);
+
+    if (dev == 0) {
+        printf("Failed to open audio %s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_PauseAudioDevice(dev, 0);
+}
+
+
 int main() {
     init();  // Init 8080 and SDL
+    init_audio();
     load_rom(ram, "invaders.rom");
 
     uint32_t last_tic = SDL_GetTicks();  // milliseconds
