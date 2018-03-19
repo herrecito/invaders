@@ -1,4 +1,6 @@
 bin
+.DS_store
+*.dSYM
 *.rom
 invaders
 tags
